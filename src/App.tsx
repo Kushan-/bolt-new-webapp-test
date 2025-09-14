@@ -1,9 +1,10 @@
 import React from 'react';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
+import Dashboard from './components/Dashboard';
 
 function App() {
-  const [currentPage, setCurrentPage] = React.useState<'home' | 'login' | 'signup'>('home');
+  const [currentPage, setCurrentPage] = React.useState<'home' | 'login' | 'signup' | 'dashboard'>('home');
 
   if (currentPage === 'login') {
     return <LoginPage onBack={() => setCurrentPage('home')} />;
@@ -11,6 +12,10 @@ function App() {
 
   if (currentPage === 'signup') {
     return <SignupPage onBack={() => setCurrentPage('home')} />;
+  }
+
+  if (currentPage === 'dashboard') {
+    return <Dashboard onBack={() => setCurrentPage('home')} />;
   }
 
   return (
@@ -42,7 +47,10 @@ function App() {
             Signup
           </button>
           
-          <button className="w-full sm:w-64 bg-white/10 backdrop-blur-sm text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-white/30 hover:border-white/50 hover:bg-white/20">
+          <button 
+            onClick={() => setCurrentPage('dashboard')}
+            className="w-full sm:w-64 bg-white/10 backdrop-blur-sm text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-white/30 hover:border-white/50 hover:bg-white/20"
+          >
             Go to Dashboard
           </button>
         </div>
