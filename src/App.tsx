@@ -1,11 +1,16 @@
 import React from 'react';
 import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage';
 
 function App() {
-  const [currentPage, setCurrentPage] = React.useState<'home' | 'login'>('home');
+  const [currentPage, setCurrentPage] = React.useState<'home' | 'login' | 'signup'>('home');
 
   if (currentPage === 'login') {
     return <LoginPage onBack={() => setCurrentPage('home')} />;
+  }
+
+  if (currentPage === 'signup') {
+    return <SignupPage onBack={() => setCurrentPage('home')} />;
   }
 
   return (
@@ -30,7 +35,10 @@ function App() {
             Login
           </button>
           
-          <button className="w-full sm:w-64 bg-gradient-button text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-white/20">
+          <button 
+            onClick={() => setCurrentPage('signup')}
+            className="w-full sm:w-64 bg-gradient-button text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-white/20"
+          >
             Signup
           </button>
           
