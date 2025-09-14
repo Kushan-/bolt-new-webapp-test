@@ -1,6 +1,13 @@
 import React from 'react';
+import LoginPage from './components/LoginPage';
 
 function App() {
+  const [currentPage, setCurrentPage] = React.useState<'home' | 'login'>('home');
+
+  if (currentPage === 'login') {
+    return <LoginPage onBack={() => setCurrentPage('home')} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-light-blue flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-4xl mx-auto text-center">
@@ -16,7 +23,10 @@ function App() {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-3xl mx-auto">
-          <button className="w-full sm:w-64 bg-white text-light-blue-600 font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-light-blue-200">
+          <button 
+            onClick={() => setCurrentPage('login')}
+            className="w-full sm:w-64 bg-white text-light-blue-600 font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-light-blue-200"
+          >
             Login
           </button>
           
