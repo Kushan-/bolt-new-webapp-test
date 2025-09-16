@@ -1,19 +1,42 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { authHelpers } from '../lib/supabase';
 
 interface SignupPageProps {
   onBack: () => void;
+  onSignupSuccess: () => void;
 }
 
-function SignupPage({ onBack }: SignupPageProps) {
+function SignupPage({ onBack, onSignupSuccess }: SignupPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signup attempt:', { name, email, password });
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await authHelpers.signUp(email, password, name);
+      
+      if (error) {
+        setError(error.message);
+      } else if (data.user) {
+        setSuccess(true);
+        // Auto-login after successful signup
+        setTimeout(() => {
+          onSignupSuccess();
+        }, 2000);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,6 +65,20 @@ function SignupPage({ onBack }: SignupPageProps) {
 
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl">
+                <p className="text-sm font-medium">Account created successfully! Redirecting to dashboard...</p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
+
             {/* Name Field */}
             <div>
               <label 
@@ -57,6 +94,7 @@ function SignupPage({ onBack }: SignupPageProps) {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-light-blue-500 focus:outline-none transition-colors duration-200 text-gray-700 font-medium placeholder-gray-400"
                 placeholder="Enter your full name"
+                disabled={loading || success}
                 required
               />
             </div>
@@ -76,6 +114,7 @@ function SignupPage({ onBack }: SignupPageProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-light-blue-500 focus:outline-none transition-colors duration-200 text-gray-700 font-medium placeholder-gray-400"
                 placeholder="Enter your email address"
+                disabled={loading || success}
                 required
               />
             </div>
@@ -95,6 +134,7 @@ function SignupPage({ onBack }: SignupPageProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-light-blue-500 focus:outline-none transition-colors duration-200 text-gray-700 font-medium placeholder-gray-400"
                 placeholder="Create a secure password"
+                disabled={loading || success}
                 required
               />
             </div>
@@ -103,9 +143,19 @@ function SignupPage({ onBack }: SignupPageProps) {
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full bg-gradient-button text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-white/20"
+                disabled={loading || success}
+                className="w-full bg-gradient-button text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
               >
-                Create Account
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Creating account...
+                  </>
+                ) : success ? (
+                  'Account created!'
+                ) : (
+                  'Create Account'
+                )}
               </button>
             </div>
           </form>

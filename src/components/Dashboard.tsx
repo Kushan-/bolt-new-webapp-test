@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Plus, LogOut } from 'lucide-react';
+import { ArrowLeft, Plus, LogOut, Loader2 } from 'lucide-react';
+import { authHelpers } from '../lib/supabase';
 
 interface DashboardProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ function Dashboard({ onBack }: DashboardProps) {
     'Buy groceries'
   ]);
   const [newTask, setNewTask] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,10 +23,19 @@ function Dashboard({ onBack }: DashboardProps) {
     }
   };
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log('Logging out...');
-    onBack();
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const { error } = await authHelpers.signOut();
+      if (error) {
+        console.error('Logout error:', error.message);
+      }
+    } catch (err) {
+      console.error('Unexpected logout error:', err);
+    } finally {
+      setLoading(false);
+      onBack();
+    }
   };
 
   return (
@@ -99,10 +110,20 @@ function Dashboard({ onBack }: DashboardProps) {
           <div className="pt-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
-              className="w-full bg-white text-gray-600 font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-gray-200 hover:border-gray-300 hover:text-gray-700 flex items-center justify-center"
+              disabled={loading}
+              className="w-full bg-white text-gray-600 font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-gray-200 hover:border-gray-300 hover:text-gray-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              <LogOut className="w-5 h-5 mr-2" />
-              Logout
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Signing out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="w-5 h-5 mr-2" />
+                  Logout
+                </>
+              )}
             </button>
           </div>
         </div>
